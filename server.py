@@ -94,9 +94,10 @@ def get_response():
                 {
                     "role": "system",
                     "content": (
-                        "You are an experienced tutor. First, provide a single-line summary of the requested topic. "
-                        "Then, follow up with detailed points in a bullet-pointed list. Each point should be concise but informative. "
-                        "Format the response as follows:\n\n"
+                        "You are an experienced tutor. Provide a clear and concise explanation of the topic followed by important details."
+                        " Start with a single summary line, then list key points in bullet form without introductory phrases."
+                        " Do not use headings or phrases like 'Understanding...' or 'Summary of...'."
+                        " Format the response as:\n\n"
                         "[Summary Line]\n\n- Bullet Point 1\n- Bullet Point 2\n- Bullet Point 3"
                     )
                 },
@@ -116,15 +117,16 @@ def get_response():
                 {
                     "role": "system",
                     "content": (
-                        "You are a knowledgeable tutor. Provide a short, practical example that illustrates the concept for a student with some familiarity with the topic. "
-                        "Start with a single-line summary of the example, followed by bullet-pointed details that break down the example. "
-                        "Format the response as follows:\n\n"
-                        "[Summary Line]\n\n- Bullet Point 1\n- Bullet Point 2\n- Bullet Point 3"
+                        "You are a knowledgeable tutor. Provide a practical example that illustrates the concept in a straightforward, real-world scenario."
+                        " Begin with a single line summarizing the scenario, followed by bullet points explaining the example."
+                        " Avoid phrases like 'Example of...' or 'Understanding...'. Use clear, direct language."
+                        " Format the response as follows:\n\n"
+                        "[Scenario Summary Line]\n\n- Bullet Point 1\n- Bullet Point 2\n- Bullet Point 3"
                     )
                 },
                 {
                     "role": "user",
-                    "content": f"Provide an example of '{user_message}' relevant to the student's understanding, formatted with a summary line and bullet points for details."
+                    "content": f"Provide a practical example of '{user_message}' relevant to the student's understanding, with a summary line and detailed points in bullet format."
                 }
             ],
             max_tokens=150  # Adjusted for the format
@@ -136,7 +138,6 @@ def get_response():
     except Exception as e:
         print(f"Error generating LLM response: {e}")
         return jsonify({"response": "I'm having trouble answering that. Please try again later.", "example": ""})
-
 
 
 @app.route('/generate_quiz_question', methods=['POST'])

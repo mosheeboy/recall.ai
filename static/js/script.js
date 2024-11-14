@@ -14,6 +14,7 @@ function showSubmit(input) {
     }
 }
 
+
 // Clear selected file
 function clearFile() {
     const fileInput = document.getElementById('syllabus');
@@ -26,6 +27,7 @@ function clearFile() {
     submitButton.classList.add('hidden');
     removeFile.classList.add('hidden');
 }
+
 
 // Timer functionality
 function startTimer(duration, display) {
@@ -48,6 +50,7 @@ function startTimer(duration, display) {
     }, 1000);
 }
 
+
 // Pause and resume functionality
 function togglePause() {
     const overlay = document.getElementById("overlay");
@@ -60,6 +63,7 @@ function togglePause() {
         isPaused = true;                // Pause timer
     }
 }
+
 
 // Add event listener to the timer and overlay
 document.addEventListener("DOMContentLoaded", function() {
@@ -76,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
         overlay.addEventListener("click", togglePause); // Toggle pause on overlay click
     }
 });
+
 
 // Fetch and display file summary and update current topic
 function fetchAndDisplayFileSummary() {
@@ -152,6 +157,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+
 // Send user input to the server and display the LLM's response and example
 function submitUserInput() {
     const userInput = document.getElementById("user-input");
@@ -190,12 +196,6 @@ function setCurrentTopic(topic) {
     displayLLMMessage(`Let's dive into ${topic}.`);
 }
 
-// Start the quiz timer
-function startQuizTimer() {
-    const quizTimerDuration = 1 * 60 * 1000; // 5 minutes in milliseconds
-    setTimeout(fetchQuizQuestion, quizTimerDuration);
-}
-
 // Start Knowledge Check: Blur the tutor section and start the quiz
 function startKnowledgeCheck() {
     const tutorSection = document.getElementById("tutor-section");
@@ -220,19 +220,18 @@ function fetchQuizQuestion() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Quiz question data:", data);  // Debugging statement
         if (data.error) {
             displayQuiz("Quiz unavailable at this time.");
         } else if (data.question && data.options && data.correctAnswer) {
+            totalQuestionsCount++;
             displayQuiz(data.question, data.options, data.correctAnswer);
+            updateScoreDisplay(); // Update the score display for total questions
         } else {
-            console.error("Incomplete data received:", data);
             displayQuiz("Error loading quiz question.");
         }
     })
     .catch(error => console.error('Error fetching quiz question:', error));
 }
-
 
 function displayQuiz(question, options, correctAnswer) {
     const quizSection = document.getElementById("quiz-section");
@@ -253,15 +252,17 @@ function displayQuiz(question, options, correctAnswer) {
     });
 }
 
-// Handle answer selection and provide feedback
+
+// Handle answer selection
 function handleAnswerSelection(selectedButton, correctAnswer) {
     const isCorrect = selectedButton.textContent === correctAnswer;
     if (isCorrect) {
         selectedButton.classList.add("correct-answer");
-        alert("Correct!");
+        correctAnswersCount++;  // Increment the correct answers count
+        updateScoreDisplay();   // Update the score display
+        fetchQuizQuestion();    // Fetch a new question
     } else {
         selectedButton.classList.add("incorrect-answer");
-        alert(`Incorrect! The correct answer is: ${correctAnswer}`);
     }
 }
 
@@ -276,6 +277,9 @@ function updateScoreDisplay() {
         scoreDisplay.textContent = `Score: ${correctAnswersCount}/${totalQuestionsCount}`;
     }
 }
+
+
+
 
 // Initialize the Fact Carousel
 function initializeFactCarousel() {
@@ -313,7 +317,6 @@ Content = "No facts available.";
 window.onload = function () {
     const duration = 25 * 60;
     const display = document.getElementById('timer');
-    startTimer(duration, display);
-    startQuizTimer();
+    startTimer(duration, display); // Start the timer
     initializeFactCarousel();
 };
