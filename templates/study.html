@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Session</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header class="study-header">
+        <div class="timer-container">
+            <div id="timer">25:00</div>
+        </div>
+        <div class="app-title">
+            <h1>Recall.ai</h1>
+        </div>
+        <div class="score-container">
+            <div id="score-display">Score: 0/0</div>
+        </div>
+    </header>
+    
+    <div class="study-container">
+        <div class="tutor-section" id="tutor-section">
+            <div id="chat-container">
+                <!-- Fixed greeting message from the LLM -->
+                <div class="message llm-message">Thank you for sharing your syllabus! What can I help you with?</div>
+            </div>
+            <div class="user-input-area">
+                <textarea id="user-input" placeholder="Type your question or message..."></textarea>
+            </div>
+        </div>
+        
+        <div class="quiz-section" id="quiz-section">
+            <!-- Knowledge Check Button -->
+            <button id="knowledge-check-button" onclick="startKnowledgeCheck()">Knowledge Check</button>
+            <!-- Quiz content will be added here after the button is clicked -->
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <span class="pause-message">Study session is paused. Click anywhere to resume.</span>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>© 2024 Recall.ai. All Rights Reserved.</p>
+    </footer>
+
+    <!-- External JavaScript file -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

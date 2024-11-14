@@ -1,0 +1,192 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+/*font-family: 'Roboto', sans-serif;*/
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+/*font-family: 'Montserrat', sans-serif;*/
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap'); 
+/*font-family: 'Open Sans', sans-serif;*/
+
+/*
+eggshell: f4f3ee
+gray: bcb8b1
+taupe: 8a817c
+dark gray: 463f3a
+*/
+
+
+/* Base Styles */
+body, html {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    height: 100%;
+    color: #f4f3ee;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Layout Structure */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 50px); /* Adjust height to accommodate footer */
+}
+
+main {
+    flex-grow: 1;
+    padding: 20px 0;
+}
+
+/* Hero Section */
+.hero {
+    background-color: #ffffff;
+    padding: 40px 0;
+    text-align: center;
+    width: 100%;
+}
+
+.hero h1 {
+    color: #6b9080;
+    font-size: 8em;
+    margin: 0;
+    padding-top: 50px;
+}
+
+.hero p {
+    font-size: 1.5em;
+    color: #666;
+    margin-top: 10px;
+}
+
+/* Fact Carousel */
+.fact-carousel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    margin: 0;
+    padding: 10px 0;
+    background-color: #f0f0f0;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-style: italic;
+    font-size: 1.1em;
+}
+
+.fact-carousel-inner {
+    white-space: nowrap;
+    overflow: hidden;
+    animation: scroll-left 80s linear infinite;
+}
+
+#fact-display {
+    font-size: 1em;
+    color: #333;
+}
+
+/* Keyframes for Carousel Scrolling Effect */
+@keyframes scroll-left {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Upload Section */
+.upload-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    text-align: center;
+    margin-top: -30px; /* Optional: adjust this if you want the button to sit higher */
+    font: "Poppins", sans-serif;
+}
+
+.upload-title h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* File Upload Button */
+.custom-file-upload {
+    display: inline-block;
+    padding: 15px 30px;
+    background-color: #a4c3b2;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1.2em;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.custom-file-upload input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload:hover {
+    background-color: #6b9080;
+}
+
+/* Submit Button */
+#submit-container {
+    margin-top: 10px;
+    text-align: center;
+}
+
+#submit-button {
+    background-color: transparent; /* Transparent background */
+    color: #d1e7dd; /* Dark text color to stand out on transparent background */
+    padding: 10px 20px;
+    border: 0.25px solid #6b9080; /* Border to outline the button */
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for background and text color */
+}
+
+#submit-button:hover {
+    background-color: #c2e6d6; /* Darker background on hover */
+    color: #000000; /* White text color on hover for contrast */
+}
+
+/* Footer */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    padding: 10px 0;
+    background-color: #f0f0f0;
+    text-align: center;
+    font-size: 0.8em;
+    box-sizing: border-box;
+}
+
+footer p {
+    color: #666;
+    margin: 0;
+}
