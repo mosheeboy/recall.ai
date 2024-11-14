@@ -223,7 +223,6 @@ function fetchQuizQuestion() {
         if (data.error) {
             displayQuiz("Quiz unavailable at this time.");
         } else if (data.question && data.options && data.correctAnswer) {
-            totalQuestionsCount++;
             displayQuiz(data.question, data.options, data.correctAnswer);
             updateScoreDisplay(); // Update the score display for total questions
         } else {
@@ -253,22 +252,53 @@ function displayQuiz(question, options, correctAnswer) {
 }
 
 
+// Initialize score counters
+let correctAnswersCount = 0;
+let totalQuestionsCount = 0;
+
 // Handle answer selection
 function handleAnswerSelection(selectedButton, correctAnswer) {
     const isCorrect = selectedButton.textContent === correctAnswer;
+
     if (isCorrect) {
         selectedButton.classList.add("correct-answer");
         correctAnswersCount++;  // Increment the correct answers count
         updateScoreDisplay();   // Update the score display
-        fetchQuizQuestion();    // Fetch a new question
     } else {
         selectedButton.classList.add("incorrect-answer");
     }
+
+    // Increment the total questions count after an answer is selected
+    totalQuestionsCount++;
+    updateScoreDisplay(); // Update the score display with the new total
+
+    // Check if the quiz should end
+    if (totalQuestionsCount >= 3) {
+        endQuiz(); // End the quiz and return to the tutor page
+    } else {
+        // Brief delay before fetching the new question to allow user to see feedback
+        setTimeout(fetchQuizQuestion, 500);
+    }
 }
 
-// Initialize score counters
-let correctAnswersCount = 0;
-let totalQuestionsCount = 0;
+// End the quiz and return to the tutor page
+function endQuiz() {
+    const tutorSection = document.getElementById("tutor-section");
+    const quizSection = document.getElementById("quiz-section");
+    const knowledgeCheckButton = document.getElementById("knowledge-check-button");
+
+    // Unblur the tutor section
+    tutorSection.classList.remove("blur");
+
+    // Hide the quiz section and show the knowledge check button again
+    quizSection.innerHTML = ""; // Clear quiz content
+    knowledgeCheckButton.style.display = "block";
+
+    // Reset question count and score if needed for future quizzes
+    correctAnswersCount = 0;
+    totalQuestionsCount = 0;
+    updateScoreDisplay();
+}
 
 // Function to update the score display
 function updateScoreDisplay() {
@@ -277,8 +307,6 @@ function updateScoreDisplay() {
         scoreDisplay.textContent = `Score: ${correctAnswersCount}/${totalQuestionsCount}`;
     }
 }
-
-
 
 
 // Initialize the Fact Carousel
