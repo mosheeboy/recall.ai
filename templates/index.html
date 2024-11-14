@@ -4,44 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recall.ai</title>
-    <link href="/static/css/output.css" rel="stylesheet"> <!-- Link to Tailwind output.css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">    
 </head>
-<body class="bg-gray-100 font-sans">
-
+<body>
     <!-- Fact Carousel as a Top Header -->
-    <div class="bg-blue-600 text-white py-2 text-center">
-        <div class="overflow-hidden">
-            <span id="fact-display" class="italic animate-marquee">Loading facts...</span>
+    <div class="fact-carousel">
+        <div class="fact-carousel-inner">
+            <span id="fact-display">Loading facts...</span>
         </div>
     </div>
 
-    <!-- Main Wrapper -->
-    <div class="min-h-screen flex flex-col items-center justify-center">
-        
-        <!-- Header Section -->
-        <header class="bg-blue-500 w-full py-10 text-center text-white">
-            <h1 class="text-4xl font-bold mb-2">Recall.ai</h1>
-            <p class="text-lg">Begin your study session here.</p>
+    <div class="wrapper">
+        <header class="hero">
+            <div class="container">
+                <h1>Recall.ai</h1>
+                <p>Begin your study session here.</p>
+            </div>
         </header>
         
-        <!-- Main Content -->
-        <main class="flex flex-col items-center mt-10">
-            <div class="w-4/5 md:w-1/2 bg-white rounded-lg shadow-md p-6">
-                <form action="{{ url_for('upload_syllabus') }}" method="post" enctype="multipart/form-data" class="space-y-4">
-                    <label class="flex items-center justify-center bg-gray-200 text-gray-700 py-3 px-6 rounded-lg cursor-pointer hover:bg-gray-300">
-                        <input type="file" id="syllabus" name="file" accept=".pdf, .docx, .txt" required class="hidden" onchange="showSubmit(this)">
-                        <span id="button-text">Upload Your Syllabus</span>
-                    </label>
-                    <div id="submit-container" class="hidden">
-                        <button type="submit" id="submit-button" class="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">GO &gt;</button>
-                    </div>
-                </form>
+        <main>
+            <div class="container">
+                <div class="upload-wrapper">
+                    <form action="{{ url_for('upload_syllabus') }}" method="post" enctype="multipart/form-data">
+                        <label class="custom-file-upload">
+                            <input type="file" id="syllabus" name="file" accept=".pdf, .docx, .txt" required onchange="showSubmit(this)">
+                            <span id="button-text">Upload Your Syllabus</span>
+                        </label>
+                        <div id="submit-container" class="hidden">
+                            <button type="submit" id="submit-button">GO ></button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="w-full bg-gray-800 text-center py-4 text-white mt-10">
+    <!-- Footer moved outside wrapper -->
+    <footer>
         <p>© 2024 Recall.ai. All Rights Reserved.</p>
     </footer>
 
