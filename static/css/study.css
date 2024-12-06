@@ -1,14 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700&display=swap');
 /* Base Font Style */
 
 /* Reset body margin and padding */
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Study Page Header */
@@ -17,35 +16,176 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: transparent;
+    position: relative;
+    border-bottom: 1px solid var(--header-border);
+    background: linear-gradient(45deg, #6b9080, #a4c3b2);
+}
+
+.app-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+}
+
+/* Progress Button */
+.progress-button {
+    background-color: rgba(255, 255, 255, 0.2);
     color: white;
-    border-bottom: 1px solid #a4c3b2;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.progress-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Theme Toggle Switch */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #6b9080;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+    content: "";
+}
+
+#theme-toggle-btn {
+    opacity: 0;
 }
 
 /* App Title */
 .app-title h1 {
-    font-size: 1.4em; /* Adjust as needed */
-    color: #6b9080;
+    font-size: 1.4em;
+    color: white;
     font-weight: bold;
     margin: 0;
-    font-family: 'Libre Baskerville', serif;;
+    font-family: 'Libre Baskerville', serif;
+    background-image: linear-gradient(45deg, #ffffff, #f4f3ee);
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 10s infinite ease-in-out;
+    transition: transform 0.3s ease, text-shadow 0.3s ease;
 }
+
+.app-title a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.app-title a:hover h1 {
+    transform: scale(1.05);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.app-title a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.app-title a:hover {
+    color: #f4f3ee;
+}
+
 
 /* Timer and Score Container */
 .timer-container, .score-container {
     display: flex;
     align-items: center;
-    cursor: pointer;
-    background-color: #6b9080;
+    background-color: rgba(255, 255, 255, 0.2);
     color: white;
     padding: 5px 10px;
     border-radius: 5px;
-    font-size: 1.1em;
-    transition: background-color 0.3s ease;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    font-family: 'Geist Mono', monospace;
+}
+
+/* Only apply hover effects to timer */
+.timer-container {
+    cursor: pointer;
+}
+
+.timer-container:hover {
+    background-color: #a4c3b2;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .timer-container.paused {
-    background-color: #666; /* Optional: change color when paused */
+    background-color: var(--button-bg);
+}
+
+.timer-container.paused:hover {
+    background-color: #a4c3b2;
 }
 
 /* Remove absolute positioning from #score-display */
@@ -53,6 +193,7 @@ body {
     font-size: 1.1em;
     color: white;
     margin: 0;
+    font-family: 'Geist Mono', monospace;
 }
 
 .overlay {
@@ -68,15 +209,16 @@ body {
     align-items: center;
     z-index: 9999; /* Ensure it’s above all other elements */
     cursor: pointer;
+    font-family: 'Libre Baskerville', serif;
 }
 
 .pause-message {
     color: white;
-    font-size: 1em; /* Reduced font size for a minimalistic look */
+    font-size: 1.2em; /* Reduced font size for a minimalistic look */
     text-align: center;
     padding: 15px 30px;
     backdrop-filter: blur(8px); /* Apply the same blur effect as the overlay */
-    background: rgba(215, 215, 215, 0.3); /* Slightly transparent background */
+    background: rgba(206, 206, 206, 0.323); /* Slightly transparent background */
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -86,6 +228,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Fact Carousel Styling */
@@ -98,11 +241,13 @@ body {
     align-items: center;
     flex-grow: 1;
     margin-right: 20px;
+    font-family: 'Libre Baskerville', serif;
 }
 
 .fact-carousel-inner {
     display: inline-block;
     white-space: nowrap;
+    font-family: 'Libre Baskerville', serif;
 }
 
 #fact-display {
@@ -110,16 +255,7 @@ body {
     white-space: nowrap;
     font-style: italic;
     animation: scroll-left 80s linear infinite; /* Adjust 80s to slow down the animation */
-}
-
-/* Keyframes for scrolling animation */
-@keyframes scroll-left {
-    0% {
-        transform: translateX(100%); /* Start fully off-screen to the right */
-    }
-    100% {
-        transform: translateX(-100%); /* Move fully off-screen to the left */
-    }
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Study Page Layout */
@@ -127,7 +263,7 @@ body {
     display: flex;
     width: 100%;
     height: calc(100vh - 60px);
-    font: "Poppins", sans-serif;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Tutor Section: 2/3 width */
@@ -139,7 +275,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    font: "Poppins", sans-serif;
+    font-family: 'Libre Baskerville', serif;
     font-size: 1em;
 }
 
@@ -150,11 +286,11 @@ body {
 
 #tutor-response {
     flex-grow: 1;
-    font-size: 0.85em;
+    font-size: 0.9em;
     line-height: 1.5;
     margin-bottom: 20px;
     padding-right: 10px;
-    font: "Poppins", sans-serif;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* User Input Area */
@@ -164,8 +300,8 @@ body {
     gap: 10px;
     margin-top: auto;
     padding-bottom: 30px;
-    font-family: "Poppins", sans-serif;
-    font-size: 1em;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.8em;
 }
 
 #user-input {
@@ -176,46 +312,57 @@ body {
     font-size: 1em;
     border: 1px solid #ddd;
     border-radius: 10px;
-    font-family: "Poppins", sans-serif;
-    color: #333; /* Text color */
+    font-family: 'Libre Baskerville', serif;
+    color: #000000; /* Text color */
+}
+
+#user-input:focus {
+    outline: 1px solid #6b9080; /* Replace with your desired color (e.g., orange) */
+    outline-offset: 2px; /* Optional: adds spacing between the element and the outline */
+    box-shadow: 0 0 5px #6b9080; /* Optional: add a subtle glow effect */
 }
 
 #knowledge-check-button {
-    padding: 10px 8px; /* Smaller padding on left and right */
-    font-size: 18px;
+    padding: 12px 24px;  /* Increased padding */
+    font-size: 16px;     /* Larger font size */
     cursor: pointer;
     margin-top: 20px;
-    border-radius: 20px;
-    background-color: #cce3de;
+    border-radius: 25px;  /* Slightly larger radius */
+    background-color: var(--button-bg);
+    color: var(--button-text);
     border: none;
-    width: auto; /* Ensures button width is based on content */
-    display: inline-block; /* Allows the button to fit closely around text */
-    transition: background-color 0.3s ease;
-    font-family: "Poppins", sans-serif;
+    width: fit-content;
+    display: inline-block;
+    transition: all 0.3s ease;
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 500;    /* Slightly bolder text */
+    letter-spacing: 0.5px; /* Better text spacing */
 }
 
-/* Hover effect for a darker green */
 #knowledge-check-button:hover {
-    background-color: #a8e0d4; 
+    background-color: var(--llm-message-bg);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle hover shadow */
 }
 
 /* Quiz Section Styling */
 .quiz-section {
     flex: 1;
     padding: 20px;
-    background-color: #f9f9f9;
-    border-left: 1px solid #ddd;
+    background-color: var(--quiz-section-bg);
+    border-left: 1px solid var(--header-border);
     display: flex;
     flex-direction: column;
+    align-items: center;  /* Center content horizontally */
     color: black;
-    font-family: "Poppins", sans-serif;
-    
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Quiz Section Title */
 .quiz-section h2 {
     font-size: 1em;
     margin-bottom: 10px;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Quiz Question Text */
@@ -223,28 +370,29 @@ body {
     font-size: 1em;
     margin-bottom: 20px;
     color: black;
-    font-family: "Poppins", sans-serif;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Quiz Option Button Styling */
 .quiz-option {
     display: block;
     width: 100%;
-    margin: 8px 0;
-    padding: 10px;
-    background-color: #a4c3b2;
-    color: black;
-    border: none;
-    border-radius: 5px;
+    padding: 8px 15px;
+    margin: 5px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--quiz-option-bg);
+    color: var(--text-color);
     cursor: pointer;
-    font-size: 0.9em;
+    transition: background-color 0.2s;
     text-align: left;
-    transition: background-color 0.3s ease;
-    font-family: "Poppins", sans-serif;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1em;
 }
 
 .quiz-option:hover {
-    background-color: #6b9080;
+    background-color: #a4c3b2;
+    transform: scale(1.02);
 }
 
 /* Style for multiple-choice answer buttons */
@@ -252,7 +400,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    font-family: "Poppins", sans-serif;
+    font-family: 'Libre Baskerville', serif;
 }
 
 .answer-option {
@@ -265,10 +413,15 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease;
     text-align: left;
+    font-family: 'Libre Baskerville', serif;
 }
 
 .answer-option:hover {
     background-color: #6b9080;
+}
+
+.quiz-option:active, .answer-option:active {
+    transform: scale(0.95); /* Slight reduction to simulate button press */
 }
 
 /* Footer */
@@ -278,6 +431,7 @@ footer {
     text-align: center;
     font-size: 0.9em;
     color: #666;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Base styling for the chat container */
@@ -288,17 +442,70 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* LLM message bubble styling */
 .message {
-    padding: 10px 15px;
-    border-radius: 15px;
-    max-width: 75%;
-    line-height: 1.4;
+    padding: 15px 20px;
+    margin: 10px 0;
+    border-radius: 12px;
+    max-width: 85%;
+    line-height: 1.5;
+    font-size: 16px;
+}
+
+.user-message {
+    background-color: var(--user-message-bg);
+    color: var(--text-color);
+    margin-left: auto;
+    border: 1px solid var(--border-color);
+}
+
+.llm-message {
+    background-color: var(--llm-message-bg);
+    color: var(--text-color);
+    margin-right: auto;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Math expression styling */
+.llm-message .MathJax {
+    margin: 10px 0;
+    display: block;
+    overflow-x: auto;
+    font-size: 1.1em;
+}
+
+.llm-message p {
+    margin: 12px 0;
+}
+
+.llm-message ul, .llm-message ol {
+    margin: 10px 0;
+    padding-left: 25px;
+}
+
+.llm-message code {
+    background-color: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
     font-size: 0.9em;
-    display: inline-block;
-    word-wrap: break-word;
+}
+
+.llm-message pre {
+    background-color: var(--code-bg);
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 15px 0;
+}
+
+.llm-message pre code {
+    background-color: transparent;
+    padding: 0;
 }
 
 /* User message bubble styling */
@@ -307,7 +514,7 @@ footer {
     color: #333;
     align-self: flex-end;
     border-radius: 15px 15px 0 15px;
-    font-family: "Poppins", sans-serif;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* LLM message bubble styling */
@@ -316,22 +523,22 @@ footer {
     color: #333;
     align-self: flex-start;
     border-radius: 15px 15px 15px 0;
-    /*font-family: 'Libre Baskerville', serif;*/
-    font-family: Arial;
-    font-size: 0.85em; /* Adjust size if needed */
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.9em; /* Adjust size if needed */
     max-width: 80%;
     margin: 5px 0;
     padding: 10px;
-    font-family: "Poppins", sans-serif;
 }
 
 .message ul {
     padding-left: 20px;
     list-style-type: disc;
+    font-family: 'Libre Baskerville', serif;
 }
 
 .message li {
     margin-bottom: 5px;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Correct Answer Styling */
@@ -340,6 +547,7 @@ footer {
     color: white;
     border: none;
     transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: 'Libre Baskerville', serif;
 }
 
 /* Incorrect Answer Styling */
@@ -347,6 +555,714 @@ footer {
     background-color: #d7616c; /* Red background for incorrect answer */
     color: white;
     border: none;
+    transition: background-color 0.3s ease, color 0.2s ease;
+    font-family: 'Libre Baskerville', serif;
+}
+
+
+/* Dark mode variables */
+:root {
+    --bg-color: #f9f9f9;
+    --text-color: #333;
+    --chat-bg: #f0f0f0;
+    --user-message-bg: #d1e7dd;
+    --llm-message-bg: #f0f0f0;
+    --header-border: #a4c3b2;
+    --button-bg: #6b9080;
+    --button-text: white;
+    --input-bg: white;
+    --input-text: #333;
+    --quiz-section-bg: #f9f9f9;
+    --quiz-option-bg: #a4c3b2;
+    --quiz-option-text: white;
+    --footer-bg: #f0f0f0;
+    --footer-text: #666;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-hover: #e8e8e8;
+    --text-primary: #333333;
+    --border-color: #dddddd;
+    --primary-color: #6b9080;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;          /* Darker background */
+    --text-color: #e0e0e0;        /* Light text */
+    --chat-bg: #1a1a1a;           /* Dark chat background */
+    --user-message-bg: #2f2f2f;   /* Dark gray user messages */
+    --llm-message-bg: #2f2f2f;    /* Dark gray LLM messages */
+    --header-border: #333333;     /* Darker border */
+    --button-bg: #6b9080;         /* Keep accent color */
+    --button-text: #ffffff;
+    --input-bg: #2f2f2f;          /* Dark gray input */
+    --input-text: #e0e0e0;
+    --quiz-section-bg: #1a1a1a;   /* Dark quiz background */
+    --quiz-option-bg: #6b9080;    /* Keep accent color */
+    --quiz-option-text: #ffffff;
+    --footer-bg: #1a1a1a;         /* Dark footer */
+    --footer-text: #999999;       /* Light gray footer text */
+    --bg-primary: #2d2d2d;
+    --bg-secondary: #1f1f1f;
+    --bg-hover: #3d3d3d;
+    --text-primary: #e0e0e0;
+    --border-color: #404040;
+    --primary-color: #81C784;
+}
+
+/* Apply variables */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.message {
+    color: var(--text-color);
+}
+
+.user-message {
+    background-color: var(--user-message-bg);
+}
+
+.llm-message {
+    background-color: var(--llm-message-bg);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    margin: 0 15px;
+}
+
+#theme-toggle-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+#theme-toggle-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Dark mode transitions */
+body, .message, .user-message, .llm-message {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Update existing elements to use variables */
+.study-container {
+    background-color: var(--bg-color);
+}
+
+.tutor-section {
+    background-color: var(--bg-color);
+    border-right: 1px solid var(--header-border);
+}
+
+.quiz-section {
+    background-color: var(--quiz-section-bg);
+    border-left: 1px solid var(--header-border);
+}
+
+#user-input {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid var(--header-border);
+}
+
+#user-input::placeholder {
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.quiz-option {
+    background-color: var(--quiz-option-bg);
+    color: var(--quiz-option-text);
+    border: 1px solid var(--header-border);
+}
+
+#knowledge-check-button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+}
+
+.correct-answer {
+    background-color: var(--correct-answer-bg) !important;
+    color: var(--button-text);
+}
+
+.incorrect-answer {
+    background-color: var(--incorrect-answer-bg) !important;
+    color: var(--button-text);
+}
+
+footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+}
+
+/* Update transitions for smooth theme switching */
+.study-container,
+.tutor-section,
+.quiz-section,
+#user-input,
+.quiz-option,
+#knowledge-check-button,
+footer {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Ensure quiz text is visible in dark mode */
+.quiz-section p {  /* Quiz question */
+    color: var(--text-color);
+    margin-bottom: 20px;
+    font-size: 1em;
+}
+
+.quiz-option {
+    background-color: var(--quiz-option-bg);
+    color: var(--quiz-option-text);
+    border: 1px solid var(--header-border);
+}
+
+.quiz-option:hover {
+    background-color: var(--llm-message-bg);
+    transform: scale(1.02);
+}
+
+/* Update transitions for smoother theme switching */
+* {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease;
+}
+
+/* Action buttons container */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+/* Shared button styles */
+.action-buttons button {
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 25px;
+    background-color: #6b9080;
+    color: white;
+    border: none;
+    width: fit-content;
+    display: inline-block;
+    transition: all 0.3s ease;
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.action-buttons button:hover {
+    background-color: #a4c3b2;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove individual button styles */
+#knowledge-check-button {
+    margin-top: 0;  /* Remove margin since it's handled by container */
+}
+
+#summarize-button {
+    /* No additional styles needed */
+}
+
+#summary-content {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: var(--llm-message-bg);
+    color: var(--text-color);
+    font-size: 0.9em;
+    line-height: 1.4;
+    display: none;  /* Hidden by default */
+}
+
+.summary-content {
+    width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: var(--llm-message-bg);
+    color: var(--text-color);
+    font-size: 0.9em;
+    line-height: 1.4;
+    display: none;  /* Hidden by default */
+}
+
+.summary-content ul {
+    padding-left: 20px;
+    margin: 8px 0;
+}
+
+.summary-content li {
+    margin-bottom: 6px;
+}
+
+.summary-content p {
+    margin: 8px 0;
+}
+
+/* Remove any individual hover styles */
+#knowledge-check-button:hover,
+#summarize-button:hover {
+    background-color: #a4c3b2;  /* Ensure same hover color for both buttons */
+}
+
+.empty-summary-message {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-color);
+    font-style: italic;
+    background-color: var(--llm-message-bg);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.empty-quiz-message {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-color);
+    font-style: italic;
+    background-color: var(--llm-message-bg);
+    border-radius: 8px;
+    margin: 10px 0;
+    width: 90%;
+    margin: 20px auto;
+}
+
+.mermaid {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+[data-theme="dark"] .mermaid {
+    background: #2d2d2d;
+}
+
+/* Timer hover effect */
+.timer-container {
+    position: relative;
+    cursor: pointer;
+}
+
+.timer-container::after {
+    content: 'PAUSE';
+    position: absolute;
+    top: 50%;          /* Center vertically */
+    left: 50%;         /* Center horizontally */
+    transform: translate(-50%, -50%);  /* Perfect centering */
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    font-size: 0.9em;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    width: 100%;       /* Take full width of container */
+    height: 100%;      /* Take full height of container */
+    display: flex;     /* For centering the text */
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;  /* Match container's border radius */
+}
+
+.timer-container:hover::after {
+    opacity: 1;
+    background-color: #a4c3b2;  /* Match your hover color */
+}
+
+/* Hide the timer text when showing pause */
+.timer-container:hover #timer {
+    opacity: 0;
+}
+
+/* Break overlay styling */
+.break-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(164, 195, 178, 0.9); /* Semi-transparent green using your theme color */
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    cursor: pointer;
+    font-family: 'Libre Baskerville', serif;
+}
+
+.break-message {
+    color: white;
+    font-size: 1.5em;
+    text-align: center;
+    padding: 20px 30px;
+    background: rgba(107, 144, 128, 0.8); /* Darker green for contrast */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Libre Baskerville', serif;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Break confirmation styling */
+.break-confirmation {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: none;
+    color: #333;
+    font-family: 'Libre Baskerville', serif;
+}
+
+.confirmation-text {
+    display: block;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+.confirmation-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.confirm-btn, .cancel-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Libre Baskerville', serif;
+    transition: all 0.3s ease;
+}
+
+.confirm-btn {
+    background-color: var(--button-bg);
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.confirm-btn:hover, .cancel-btn:hover {
+    transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+        filter: blur(2px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+.sentence {
+    display: inline-block;
+    opacity: 0;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+    opacity: 0;
+}
+
+/* Ensure proper spacing between sentences */
+.sentence + .sentence {
+    margin-left: 0.2em;
+}
+
+.new-session-btn {
+    display: block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Libre Baskerville', serif;
+    transition: all 0.3s ease;
+}
+
+.new-session-btn:hover {
+    background-color: #a4c3b2;
+    transform: scale(1.05);
+}
+
+.new-session-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    animation-delay: 0.5s;  /* Delay after the message appears */
+}
+
+.new-session-btn {
+    padding: 8px 16px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.new-session-btn:hover {
+    background-color: #a4c3b2;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.back-container {
+    display: flex;
+    align-items: center;
+}
+
+.back-button {
+    color: white;
+    text-decoration: none;
+    font-family: 'Geist Mono', monospace;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(-3px);
+}
+
+.progress-button {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    font-family: 'Geist Mono', monospace;
+}
+
+.progress-link {
+    text-decoration: none;
+}
+
+.progress-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Quiz styling */
+.quiz-container {
+    margin: 1em 0;
+    padding: 1.5em;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    color: var(--text-primary);
+}
+
+.quiz-question {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8em;
+    margin-top: 5px;
+}
+
+.quiz-option {
+    display: block;
+    width: 100%;
+    padding: 8px 15px;
+    margin: 5px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--quiz-option-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-align: left;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1em;
+}
+
+.quiz-option:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--primary-color);
+}
+
+.quiz-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.quiz-option.correct-answer {
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.15);
+    color: #1B5E20;
+    font-weight: 500;
+}
+
+[data-theme='dark'] .quiz-option.correct-answer {
+    background: rgba(76, 175, 80, 0.25);
+    color: #81C784;
+}
+
+.quiz-option.incorrect-answer {
+    border-color: #f44336;
+    background: rgba(244, 67, 54, 0.15);
+    color: #B71C1C;
+}
+
+[data-theme='dark'] .quiz-option.incorrect-answer {
+    background: rgba(244, 67, 54, 0.25);
+    color: #E57373;
+}
+
+.quiz-feedback {
+    margin-top: 1.2em;
+    padding: 1em;
+    border-radius: 6px;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.quiz-feedback.correct {
+    background: rgba(76, 175, 80, 0.15);
+    color: #2E7D32;
+    border: 1px solid #4CAF50;
+}
+
+[data-theme='dark'] .quiz-feedback.correct {
+    background: rgba(76, 175, 80, 0.25);
+    color: #81C784;
+    border-color: #4CAF50;
+}
+
+.quiz-feedback.incorrect {
+    background: rgba(244, 67, 54, 0.15);
+    color: #C62828;
+    border: 1px solid #f44336;
+}
+
+[data-theme='dark'] .quiz-feedback.incorrect {
+    background: rgba(244, 67, 54, 0.25);
+    color: #E57373;
+    border-color: #f44336;
+}
+
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--bg-color);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.modal-content h3 {
+    margin: 0 0 15px 0;
+    color: var(--text-color);
+    font-family: 'Libre Baskerville', serif;
+}
+
+.modal-content p {
+    margin: 0 0 20px 0;
+    color: var(--text-color);
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.confirm-btn, .cancel-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.confirm-btn {
+    background-color: #d7616c;
+    color: white;
+}
+
+.confirm-btn:hover {
+    background-color: #c15058;
+    transform: scale(1.02);
+}
+
+.cancel-btn {
+    background-color: #6b9080;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #5d7a6f;
+    transform: scale(1.02);
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress - Recall.ai</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/progress.css') }}">
+</head>
+<body>
+    <header class="study-header">
+        <div class="back-container">
+            <a href="{{ url_for('study') }}" class="back-button">
+                ← BACK TO STUDY
+            </a>
+        </div>
+        <div class="app-title">
+            <a href="#" onclick="confirmNavigation('{{ url_for('index') }}'); return false;">
+                <h1>Recall.ai</h1>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle-btn">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Warning Modal -->
+    <div id="navigation-modal" class="modal">
+        <div class="modal-content">
+            <h3>Return to Home Page?</h3>
+            <p>Are you sure you want to return to the home page? Your current session will end.</p>
+            <div class="modal-buttons">
+                <button onclick="proceedToHome()" class="confirm-btn">Yes, Return Home</button>
+                <button onclick="closeModal()" class="cancel-btn">Stay Here</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        <main>
+            <div class="container">
+                <div class="current-topic">
+                    <h2>{{ current_topic }}</h2>
+                    <button id="clear-data" class="clear-data-btn">Clear Progress</button>
+                </div>
+                
+                <div class="progress-stats">
+                    <div class="quiz-score">
+                        <p>Score: <span class="score">{{ score }}</span></p>
+                    </div>
+                    
+                    <div class="quiz-history">
+                        {% if quiz_history %}
+                            {% for quiz in quiz_history %}
+                            <div class="quiz-item {% if quiz.is_correct %}correct{% else %}incorrect{% endif %}">
+                                <p class="question">{{ quiz.question }}</p>
+                                <div class="answer-details">
+                                    <p class="correct-answer">Correct Answer: {{ quiz.correct_answer }}</p>
+                                    {% if not quiz.is_correct %}
+                                        <p class="selected-answer">Your Answer: {{ quiz.selected_answer }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="no-history">No quiz attempts yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>© 2024 Recall.ai. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        let targetUrl = '';
+
+        function confirmNavigation(url) {
+            targetUrl = url;
+            document.getElementById('navigation-modal').style.display = 'flex';
+        }
+
+        function proceedToHome() {
+            window.location.href = targetUrl;
+        }
+
+        function closeModal() {
+            document.getElementById('navigation-modal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('navigation-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Add clear data functionality
+            const clearDataBtn = document.getElementById('clear-data');
+            clearDataBtn.addEventListener('click', async () => {
+                // Clear localStorage
+                localStorage.removeItem('quiz_score_correct');
+                localStorage.removeItem('quiz_score_total');
+                localStorage.removeItem('quiz_history');
+
+                // Clear server session
+                try {
+                    await fetch('/sync_quiz_data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            correct_answers: 0,
+                            total_questions: 0,
+                            quiz_history: []
+                        })
+                    });
+                    // Reload page to show cleared data
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Error clearing quiz data:', error);
+                }
+            });
+
+            // Sync quiz data first
+            try {
+                const quizHistory = JSON.parse(localStorage.getItem('quiz_history') || '[]');
+                const correctAnswers = parseInt(localStorage.getItem('quiz_score_correct')) || 0;
+                const totalQuestions = parseInt(localStorage.getItem('quiz_score_total')) || 0;
+
+                await fetch('/sync_quiz_data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        correct_answers: correctAnswers,
+                        total_questions: totalQuestions,
+                        quiz_history: quizHistory
+                    })
+                });
+            } catch (error) {
+                console.error('Error syncing quiz data:', error);
+            }
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle-btn');
+            
+            // Check for saved theme preference or default to 'light'
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            themeToggle.checked = currentTheme === 'dark';
+
+            themeToggle.addEventListener('change', () => {
+                const newTheme = themeToggle.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        });
+    </script>
+</body>
+</html> 

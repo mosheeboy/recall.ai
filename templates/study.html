@@ -3,10 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Session</title>
+    <title>Study - Recall.ai</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        .math-display {
+            display: block;
+            margin: 1.5em 0;
+            text-align: center;
+            overflow-x: auto;
+            padding: 0.5em 0;
+        }
+        .message .MathJax {
+            display: inline-block;
+            margin: 0;
+            font-size: 1.1em;
+        }
+        .message p {
+            margin: 0.8em 0;
+            line-height: 1.5;
+        }
+        .message {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .message ul {
+            margin: 0.8em 0;
+            padding-left: 2em;
+        }
+        .message li {
+            margin: 0.4em 0;
+        }
+        /* MathJax styling */
+        .message .MathJax_Display {
+            margin: 1em auto;
+            text-align: center !important;
+        }
+        .message .MathJax_CHTML {
+            text-align: center;
+            margin: 0.2em 0;
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: true,
+                processEnvironments: true,
+                tags: 'ams'  // Enable AMS-style equation numbering
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            displayAlign: 'center',
+            displayIndent: '0'
+        };
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+    </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
@@ -15,18 +75,51 @@
             <div id="timer">25:00</div>
         </div>
         <div class="app-title">
-            <h1>Recall.ai</h1>
+            <a href="#" onclick="confirmNavigation('{{ url_for('index') }}'); return false;">
+                <h1>Recall.ai</h1>
+            </a>
         </div>
-        <div class="score-container">
-            <div id="score-display">Score: 0/0</div>
+        <div class="header-right">
+            <a href="{{ url_for('progress') }}" class="progress-link">
+                <div class="progress-button">
+                    PROGRESS
+                </div>
+            </a>
+            <div class="score-container">
+                <div id="score-display">SCORE: 0/0</div>
+            </div>
+            <div class="theme-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle-btn">
+                    <span class="slider round"></span>
+                </label>
+            </div>
         </div>
     </header>
     
+    <!-- Navigation Warning Modal -->
+    <div id="navigation-modal" class="modal">
+        <div class="modal-content">
+            <h3>Return to Home Page?</h3>
+            <p>Are you sure you want to return to the home page? Your current session will end.</p>
+            <div class="modal-buttons">
+                <button onclick="proceedToHome()" class="confirm-btn">Yes, Return Home</button>
+                <button onclick="closeModal()" class="cancel-btn">Stay Here</button>
+            </div>
+        </div>
+    </div>
+
     <div class="study-container">
         <div class="tutor-section" id="tutor-section">
             <div id="chat-container">
                 <!-- Fixed greeting message from the LLM -->
-                <div class="message llm-message">Thank you for sharing your syllabus! What can I help you with?</div>
+                <div class="message llm-message">
+                    {% if current_topic != 'No topic selected' %}
+                        Thank you for sharing your syllabus for {{ current_topic }}! What can I help you with?
+                    {% else %}
+                        Thank you for sharing your syllabus! What can I help you with?
+                    {% endif %}
+                </div>
             </div>
             <div class="user-input-area">
                 <textarea id="user-input" placeholder="Type your question or message..."></textarea>
@@ -34,9 +127,14 @@
         </div>
         
         <div class="quiz-section" id="quiz-section">
-            <!-- Knowledge Check Button -->
-            <button id="knowledge-check-button" onclick="startKnowledgeCheck()">Knowledge Check</button>
-            <!-- Quiz content will be added here after the button is clicked -->
+            <!-- Action buttons container -->
+            <div class="action-buttons">
+                <button id="knowledge-check-button" onclick="startKnowledgeCheck()">Knowledge Check</button>
+                <button id="summarize-button" onclick="generateSummary()">Summarize</button>
+            </div>
+            <!-- Summary content -->
+            <div id="summary-content" class="summary-content"></div>
+            <!-- Quiz content will be added here -->
         </div>
     </div>
 
@@ -44,10 +142,45 @@
         <span class="pause-message">Study session is paused. Click anywhere to resume.</span>
     </div>
 
+    <div class="break-overlay" id="break-overlay">
+        <div class="break-confirmation" id="break-confirmation">
+            <span class="confirmation-text">Are you sure you want to skip your break?</span>
+            <div class="confirmation-buttons">
+                <button class="confirm-btn" id="confirm-skip">Yes, skip break</button>
+                <button class="cancel-btn" id="cancel-skip">No, continue break</button>
+            </div>
+        </div>
+        <span class="break-message">Take a break for 5 minutes, you earned it!</span>
+    </div>
+
     <!-- Footer Section -->
     <footer>
         <p>© 2024 Recall.ai. All Rights Reserved.</p>
     </footer>
+
+    <script>
+        let targetUrl = '';
+
+        function confirmNavigation(url) {
+            targetUrl = url;
+            document.getElementById('navigation-modal').style.display = 'flex';
+        }
+
+        function proceedToHome() {
+            window.location.href = targetUrl;
+        }
+
+        function closeModal() {
+            document.getElementById('navigation-modal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('navigation-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
 
     <!-- External JavaScript file -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

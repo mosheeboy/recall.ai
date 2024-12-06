@@ -18,12 +18,38 @@
         <header class="hero">
             <div class="container">
                 <h1>Recall.ai</h1>
-                <p>Begin your study session here.</p>
+                <div class="subtitle">
+                    <span class="subtitle-part1">Recall More, </span>
+                    <span class="subtitle-part2">Study Less</span>
+                </div>
             </div>
         </header>
         
         <main>
             <div class="container">
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <img src="{{ url_for('static', filename='images/smart-learning.png') }}" alt="Smart Learning Icon">
+                        </div>
+                        <h3>Smart Learning</h3>
+                        <p>AI-powered tutoring<br>tailored to your syllabus</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <img src="{{ url_for('static', filename='images/timer.png') }}" alt="Timer Icon">
+                        </div>
+                        <h3>Time Management</h3>
+                        <p>Built-in Pomodoro timer for<br>focused study sessions</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <img src="{{ url_for('static', filename='images/progress.png') }}" alt="Progress Icon">
+                        </div>
+                        <h3>Progress Tracking</h3>
+                        <p>Track your understanding<br>with interactive quizzes</p>
+                    </div>
+                </div>
                 <div class="upload-wrapper">
                     <form action="{{ url_for('upload_syllabus') }}" method="post" enctype="multipart/form-data">
                         <label class="custom-file-upload">
@@ -31,7 +57,10 @@
                             <span id="button-text">Upload Your Syllabus</span>
                         </label>
                         <div id="submit-container" class="hidden">
-                            <button type="submit" id="submit-button">GO ></button>
+                            <button type="submit" class="proceed-button">
+                                <span class="proceed-text">Begin Study Session</span>
+                                <span class="proceed-icon">→</span>
+                            </button>
                         </div>
                     </form>
                 </div>
