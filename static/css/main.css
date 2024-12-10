@@ -370,3 +370,23 @@ footer p {
 .feature:hover .feature-icon img {
     transform: scale(1.1);
 }
+
+/* Theme Icons */
+.theme-icon {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: opacity 0.3s ease;
+}
+
+.sun-icon {
+    right: 4px;
+    filter: brightness(0); /* Makes the moon icon black */
+}
+
+.moon-icon {
+    left: 4px;
+    filter: brightness(0) invert(1); /* Makes the sun icon white */
+}

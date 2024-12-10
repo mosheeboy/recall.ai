@@ -6,6 +6,7 @@ let correctAnswersCount = parseInt(localStorage.getItem('quiz_score_correct')) |
 let totalQuestionsCount = parseInt(localStorage.getItem('quiz_score_total')) || 0;
 let isBreakTime = false;
 let breakTimer;
+const STUDY_DURATION = 30; // Define study duration constant (30 seconds for testing)
 
 // Initialize theme
 function initializeTheme() {
@@ -28,10 +29,15 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTheme();
     initializeFactCarousel();
     
+    // Restore chat history if on study page
+    if (document.getElementById("chat-container")) {
+        restoreChatHistory();
+    }
+    
     const display = document.getElementById('timer');
     if (display) {
-        const duration = 25 * 60;
-        startTimer(duration, display);
+        display.textContent = "00:30"; // Set initial display
+        startTimer(STUDY_DURATION, display);
     }
 });
 
@@ -65,18 +71,20 @@ function clearFile() {
 
 // Timer functionality
 function startTimer(duration, display) {
-    let timer = duration, minutes, seconds;
-    timerInterval = setInterval(function () {
+    // Clear any existing interval
+    if (timerInterval) clearInterval(timerInterval);
+    
+    let timer = STUDY_DURATION;
+    
+    // Initial display update
+    updateStudyTimer(timer, display);
+    
+    timerInterval = setInterval(() => {
         if (!isPaused) {
-            minutes = parseInt(timer / 60, 10);
-            seconds = parseInt(timer % 60, 10);
-
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-
-            display.textContent = minutes + ":" + seconds;
-
-            if (--timer < 0) {
+            timer--;
+            updateStudyTimer(timer, display);
+            
+            if (timer < 0) {
                 clearInterval(timerInterval);
                 startBreak();
             }
@@ -87,52 +95,59 @@ function startTimer(duration, display) {
 function startBreak() {
     isBreakTime = true;
     const breakOverlay = document.getElementById("break-overlay");
+    const breakTimerDisplay = document.getElementById("break-timer");
     breakOverlay.style.display = "flex";
     
     // Start 5-minute break timer
     let breakTime = 5 * 60; // 5 minutes in seconds
-    const timerDisplay = document.getElementById("timer");
+    
+    // Initial display update
+    updateBreakTimer(breakTime, breakTimerDisplay);
     
     breakTimer = setInterval(() => {
-        let minutes = parseInt(breakTime / 60, 10);
-        let seconds = parseInt(breakTime % 60, 10);
-
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        timerDisplay.textContent = minutes + ":" + seconds;
-
-        if (--breakTime < 0) {
+        breakTime--;
+        updateBreakTimer(breakTime, breakTimerDisplay);
+        
+        if (breakTime < 0) {
             clearInterval(breakTimer);
             endBreak();
         }
     }, 1000);
 }
 
+// Separate function to update break timer display
+function updateBreakTimer(time, display) {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
 function endBreak() {
     isBreakTime = false;
     const breakOverlay = document.getElementById("break-overlay");
     const confirmation = document.getElementById('break-confirmation');
+    const display = document.getElementById('timer');
     
-    // Hide both overlay and confirmation
+    // Hide overlays
     breakOverlay.style.display = "none";
     confirmation.style.display = "none";
     
-    // Reset and start new timer
-    const duration = 25 * 60;  // Changed from 30 to 25 * 60 (25 minutes)
-    const display = document.getElementById('timer');
+    // Clear all intervals
+    if (timerInterval) clearInterval(timerInterval);
+    if (breakTimer) clearInterval(breakTimer);
     
-    // Clear any existing intervals
-    clearInterval(timerInterval);
-    clearInterval(breakTimer);
+    // Reset study timer to initial duration
+    display.textContent = "00:30";
     
-    // Reset timer display immediately
-    display.textContent = "25:00";  // Updated to show 25:00
-    
-    // Wait a brief moment before starting new timer
-    setTimeout(() => {
-        startTimer(duration, display);
-    }, 100);
+    // Start fresh timer
+    startTimer(STUDY_DURATION, display);
+}
+
+// Separate function to update study timer display
+function updateStudyTimer(time, display) {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 // Pause and resume functionality
@@ -167,26 +182,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (overlay) {
         overlay.addEventListener("click", togglePause);
-    }
-
-    if (breakOverlay) {
-        breakOverlay.addEventListener("click", (e) => {
-            // Only show confirmation if clicking the main overlay
-            if (e.target === breakOverlay) {
-                const confirmation = document.getElementById('break-confirmation');
-                confirmation.style.display = 'block';
-            }
-        });
-
-        // Handle confirmation buttons
-        document.getElementById('confirm-skip').addEventListener('click', () => {
-            clearInterval(breakTimer);
-            endBreak();
-        });
-
-        document.getElementById('cancel-skip').addEventListener('click', () => {
-            document.getElementById('break-confirmation').style.display = 'none';
-        });
     }
 });
 
@@ -228,20 +223,21 @@ async function displayLLMMessage(text, type = 'text', diagramCode = null) {
             // Diagram handling remains the same
             // ...
         } else {
-            // Protect LaTeX delimiters and wrap display math in divs
-            text = text.replace(/\$\$(.*?)\$\$/g, (match, p1) => {
-                // Center align display math
-                return `\n<div class="math-display" style="text-align: center;">${match}</div>\n`;
-            });
-            
-            // Handle inline math carefully
-            text = text.replace(/\$(.*?)\$/g, (match) => {
-                return match.replace(/[_*]/g, '\\$&');
+            // Configure marked.js options to preserve LaTeX delimiters
+            marked.setOptions({
+                gfm: true,
+                breaks: true,
+                smartLists: true,
+                smartypants: true
             });
 
-            // Special handling for matrix notation and "subject to" formatting
-            text = text.replace(/subject to:/g, (match) => {
-                return `\n\n${match}\n`;
+            // Protect LaTeX delimiters before markdown parsing
+            text = text.replace(/\$\$(.*?)\$\$/g, (match) => {
+                return `\n<div class="math-display">${match}</div>\n`;
+            });
+            
+            text = text.replace(/\$(.*?)\$/g, (match) => {
+                return match.replace(/[_*]/g, '\\$&');
             });
 
             // Parse markdown
@@ -263,18 +259,12 @@ async function displayLLMMessage(text, type = 'text', diagramCode = null) {
                         span.textContent = sentence.trim();
                         if (sentence.trim()) blocks.push(span);
                     });
-                } else if (node.classList && node.classList.contains('math-display')) {
-                    // Preserve math blocks with special styling
-                    const mathBlock = document.createElement('div');
-                    mathBlock.className = 'math-display fade-in';
-                    mathBlock.innerHTML = node.innerHTML;
-                    blocks.push(mathBlock);
                 } else {
-                    // Preserve other HTML elements
-                    const span = document.createElement('span');
-                    span.className = 'sentence fade-in';
-                    span.appendChild(node.cloneNode(true));
-                    blocks.push(span);
+                    // Preserve HTML elements (including math and formatting)
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'sentence fade-in';
+                    wrapper.appendChild(node.cloneNode(true));
+                    blocks.push(wrapper);
                 }
             });
             
@@ -357,7 +347,7 @@ async function submitUserInput() {
         userInput.value = "";
 
         try {
-            // Show loading state (optional)
+            // Show loading state
             const loadingDiv = document.createElement("div");
             loadingDiv.className = "message llm-message";
             loadingDiv.textContent = "Thinking...";
@@ -381,16 +371,19 @@ async function submitUserInput() {
                 await displayLLMMessage(data.response, 'text');
             }
 
+            // Save chat history after each message
+            saveChatHistory();
+
             // Scroll to bottom
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
         } catch (error) {
             console.error('Error:', error);
-            // Display error message to user
             const errorDiv = document.createElement("div");
             errorDiv.className = "message llm-message error";
             errorDiv.textContent = "Sorry, I encountered an error. Please try again.";
             chatContainer.appendChild(errorDiv);
+            saveChatHistory(); // Save even if there's an error
         }
     }
 }
@@ -638,8 +631,8 @@ document.addEventListener('DOMContentLoaded', () => {
 window.onload = function () {
     const display = document.getElementById('timer');
     if (display) {  // Only start timer if element exists
-        const duration = 25 * 60;
-        startTimer(duration, display);
+        display.textContent = "00:30"; // Set initial display
+        startTimer(STUDY_DURATION, display);
     }
 };
 
@@ -735,5 +728,70 @@ function endQuiz() {
     totalQuestionsCount = 0;
     updateScoreDisplay();
 }
+
+// Save chat history to localStorage
+function saveChatHistory() {
+    const chatContainer = document.getElementById("chat-container");
+    if (chatContainer) {
+        const messages = Array.from(chatContainer.children).map(msg => ({
+            text: msg.innerHTML,  // Save the full HTML content instead of just text
+            isUser: msg.classList.contains('user-message')
+        }));
+        localStorage.setItem('chat_history', JSON.stringify(messages));
+    }
+}
+
+// Restore chat history from localStorage
+function restoreChatHistory() {
+    const chatContainer = document.getElementById("chat-container");
+    if (!chatContainer) return;
+
+    const savedHistory = localStorage.getItem('chat_history');
+    if (savedHistory) {
+        const messages = JSON.parse(savedHistory);
+        chatContainer.innerHTML = ''; // Clear default greeting
+        
+        messages.forEach(msg => {
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${msg.isUser ? 'user-message' : 'llm-message'}`;
+            messageDiv.innerHTML = msg.text;  // Restore the full HTML content
+            chatContainer.appendChild(messageDiv);
+        });
+
+        // Reprocess LaTeX after restoring messages
+        if (window.MathJax) {
+            window.MathJax.typesetPromise([chatContainer])
+                .catch(err => console.error("MathJax error:", err));
+        }
+    }
+}
+
+// Handle skip break confirmation
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmSkip = document.getElementById('confirm-skip');
+    const cancelSkip = document.getElementById('cancel-skip');
+    const breakConfirmation = document.getElementById('break-confirmation');
+    const breakMessage = document.querySelector('.break-message');
+    
+    if (confirmSkip) {
+        confirmSkip.addEventListener('click', function() {
+            if (breakTimer) clearInterval(breakTimer);
+            endBreak();
+        });
+    }
+    
+    if (cancelSkip) {
+        cancelSkip.addEventListener('click', function() {
+            breakConfirmation.style.display = 'none';
+        });
+    }
+
+    if (breakMessage) {
+        breakMessage.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent event from bubbling up
+            breakConfirmation.style.display = 'block';
+        });
+    }
+});
 
 

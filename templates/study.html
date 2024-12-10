@@ -72,7 +72,7 @@
 <body>
     <header class="study-header">
         <div class="timer-container">
-            <div id="timer">25:00</div>
+            <div id="timer">00:30</div>
         </div>
         <div class="app-title">
             <a href="#" onclick="confirmNavigation('{{ url_for('index') }}'); return false;">
@@ -91,7 +91,10 @@
             <div class="theme-toggle">
                 <label class="switch">
                     <input type="checkbox" id="theme-toggle-btn">
-                    <span class="slider round"></span>
+                    <span class="slider round">
+                        <img src="{{ url_for('static', filename='images/icons/moon.png') }}" alt="Dark mode" class="theme-icon sun-icon">
+                        <img src="{{ url_for('static', filename='images/icons/sun.png') }}" alt="Light mode" class="theme-icon moon-icon">
+                    </span>
                 </label>
             </div>
         </div>
@@ -150,7 +153,10 @@
                 <button class="cancel-btn" id="cancel-skip">No, continue break</button>
             </div>
         </div>
-        <span class="break-message">Take a break for 5 minutes, you earned it!</span>
+        <div class="break-message-container">
+            <span class="break-message">Take a break, you earned it!</span>
+            <div class="break-timer" id="break-timer">05:00</div>
+        </div>
     </div>
 
     <!-- Footer Section -->

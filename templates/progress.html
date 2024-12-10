@@ -24,7 +24,10 @@
             <div class="theme-toggle">
                 <label class="switch">
                     <input type="checkbox" id="theme-toggle-btn">
-                    <span class="slider round"></span>
+                    <span class="slider round">
+                        <img src="{{ url_for('static', filename='images/icons/moon.png') }}" alt="Dark mode" class="theme-icon sun-icon">
+                        <img src="{{ url_for('static', filename='images/icons/sun.png') }}" alt="Light mode" class="theme-icon moon-icon">
+                    </span>
                 </label>
             </div>
         </div>
