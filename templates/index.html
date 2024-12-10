@@ -53,8 +53,8 @@
                 <div class="upload-wrapper">
                     <form action="{{ url_for('upload_syllabus') }}" method="post" enctype="multipart/form-data">
                         <label class="custom-file-upload">
-                            <input type="file" id="syllabus" name="file" accept=".pdf, .docx, .txt" required onchange="showSubmit(this)">
-                            <span id="button-text">Upload Your Syllabus</span>
+                            <input type="file" id="syllabus" name="file" accept=".pdf,application/pdf" required onchange="showSubmit(this)">
+                            <span id="button-text">Upload Your Syllabus (PDF, max 10MB)</span>
                         </label>
                         <div id="submit-container" class="hidden">
                             <button type="submit" class="proceed-button">

@@ -6,7 +6,7 @@ let correctAnswersCount = parseInt(localStorage.getItem('quiz_score_correct')) |
 let totalQuestionsCount = parseInt(localStorage.getItem('quiz_score_total')) || 0;
 let isBreakTime = false;
 let breakTimer;
-const STUDY_DURATION = 30; // Define study duration constant (30 seconds for testing)
+const STUDY_DURATION = 25 * 60; // 25 minutes in seconds
 
 // Initialize theme
 function initializeTheme() {
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const display = document.getElementById('timer');
     if (display) {
-        display.textContent = "00:30"; // Set initial display
+        display.textContent = "25:00"; // Set initial display to 25 minutes
         startTimer(STUDY_DURATION, display);
     }
 });
@@ -47,7 +47,26 @@ function showSubmit(input) {
     const submitContainer = document.getElementById('submit-container');
     
     if (input.files.length > 0) {
-        buttonText.textContent = `${input.files[0].name}`;
+        const file = input.files[0];
+        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+
+        // Check file type
+        if (!file.type.match('application/pdf')) {
+            buttonText.textContent = "Please upload a PDF file";
+            submitContainer.classList.add('hidden');
+            input.value = ''; // Clear the input
+            return;
+        }
+
+        // Check file size
+        if (file.size > maxSize) {
+            buttonText.textContent = "File must be smaller than 10MB";
+            submitContainer.classList.add('hidden');
+            input.value = ''; // Clear the input
+            return;
+        }
+
+        buttonText.textContent = `${file.name}`;
         submitContainer.classList.remove('hidden');
     } else {
         submitContainer.classList.add('hidden');
@@ -137,7 +156,7 @@ function endBreak() {
     if (breakTimer) clearInterval(breakTimer);
     
     // Reset study timer to initial duration
-    display.textContent = "00:30";
+    display.textContent = "25:00";
     
     // Start fresh timer
     startTimer(STUDY_DURATION, display);
@@ -631,7 +650,7 @@ document.addEventListener('DOMContentLoaded', () => {
 window.onload = function () {
     const display = document.getElementById('timer');
     if (display) {  // Only start timer if element exists
-        display.textContent = "00:30"; // Set initial display
+        display.textContent = "25:00"; // Set initial display to 25 minutes
         startTimer(STUDY_DURATION, display);
     }
 };
