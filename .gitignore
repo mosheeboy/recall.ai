@@ -1,1 +1,6 @@
 openai_secrets.py
+package.json
+package-lock.json
+node_modules/
+venv/
+

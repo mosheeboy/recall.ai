@@ -47,26 +47,7 @@ function showSubmit(input) {
     const submitContainer = document.getElementById('submit-container');
     
     if (input.files.length > 0) {
-        const file = input.files[0];
-        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-
-        // Check file type
-        if (!file.type.match('application/pdf')) {
-            buttonText.textContent = "Please upload a PDF file";
-            submitContainer.classList.add('hidden');
-            input.value = ''; // Clear the input
-            return;
-        }
-
-        // Check file size
-        if (file.size > maxSize) {
-            buttonText.textContent = "File must be smaller than 10MB";
-            submitContainer.classList.add('hidden');
-            input.value = ''; // Clear the input
-            return;
-        }
-
-        buttonText.textContent = `${file.name}`;
+        buttonText.textContent = `${input.files[0].name}`;
         submitContainer.classList.remove('hidden');
     } else {
         submitContainer.classList.add('hidden');

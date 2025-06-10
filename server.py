@@ -10,8 +10,12 @@ from flask import session
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'temp_key')
 
-# Initialize OpenAI client
-client = OpenAI(api_key=openai_secrets.SECRET_KEY)
+# Initialize OpenAI client with better error handling
+try:
+    client = OpenAI(api_key=openai_secrets.SECRET_KEY)
+except Exception as e:
+    print(f"Error initializing OpenAI client: {e}")
+    client = None
 
 def extract_text_from_pdf(file):
     text = ""
@@ -78,6 +82,10 @@ def index():
 
 @app.route('/upload_syllabus', methods=['POST'])
 def upload_syllabus():
+    if not client:
+        return render_template('study.html', 
+                             summary="Error: OpenAI client not properly initialized. Please check your API key.")
+
     if 'file' in request.files:
         file = request.files['file']
         
@@ -98,24 +106,30 @@ def upload_syllabus():
                     return render_template('study.html', summary="Unable to read the file. Please upload a text-based file.")
         
         # First, get the main topic from the syllabus
-        topic_response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "Extract the main topic or course name from this syllabus. Return only the topic/course name."
-                },
-                {
-                    "role": "user",
-                    "content": f"What is the main topic or course name from this syllabus:\n\n{text}"
-                }
-            ],
-            max_tokens=50
-        )
-        
-        # Store the topic in session
-        current_topic = topic_response.choices[0].message.content.strip()
-        session['current_topic'] = current_topic
+        try:
+            topic_response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "Extract the main topic or course name from this syllabus. Return only the topic/course name."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"What is the main topic or course name from this syllabus:\n\n{text}"
+                    }
+                ],
+                max_tokens=50
+            )
+            
+            # Store the topic in session
+            current_topic = topic_response.choices[0].message.content.strip()
+            session['current_topic'] = current_topic
+            
+        except Exception as e:
+            print(f"Error getting topic from OpenAI: {e}")
+            return render_template('study.html', 
+                                 summary="Error communicating with OpenAI. Please check your API key and try again.")
         
         # Generate a summary using OpenAI API with better error handling
         try:
@@ -128,7 +142,7 @@ def upload_syllabus():
                     },
                     {
                         "role": "user",
-                        "content": f"Read the following syllabus content and give a brief summary of just the main topics and skills the student will learn, without extra details. Keep it short, friendly, and focused on what the course will teach. Here’s the syllabus content: {text}"
+                        "content": f"Read the following syllabus content and give a brief summary of just the main topics and skills the student will learn, without extra details. Keep it short, friendly, and focused on what the course will teach. Here's the syllabus content: {text}"
                     }
                 ],
                 max_tokens=250
@@ -146,7 +160,7 @@ def upload_syllabus():
             print(f"OpenAI API Error: {e}")
             # Return a user-friendly error message
             return render_template('study.html', 
-                                summary="Unable to process syllabus at this time. Please try again later.")
+                                 summary="Unable to process syllabus at this time. Please check your OpenAI API key and try again.")
     
     return redirect(url_for('index'))
 
