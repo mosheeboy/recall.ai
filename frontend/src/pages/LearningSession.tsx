@@ -12,7 +12,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Send, ArrowBack, Quiz } from '@mui/icons-material';
+import { Send, ArrowBack, Quiz, KeyboardArrowDown } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLearningSession } from '../hooks/useLearningSession';
 import ChatMessage from '../components/ChatMessage';
@@ -32,11 +32,14 @@ const LearningSession: React.FC<LearningSessionProps> = ({ colorMode }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
   const [newMessage, setNewMessage] = useState('');
   const [quizScore, setQuizScore] = useState<{ score: number; total: number } | null>(null);
   const [pomodoro, setPomodoro] = useState(POMODORO_START);
   const [isPomodoroActive, setIsPomodoroActive] = useState(true);
   const pomodoroInterval = useRef<NodeJS.Timeout | null>(null);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [delayedShowArrow, setDelayedShowArrow] = useState(false);
 
   const { topic, apiKey } = location.state || {};
   const { session, isLoading, sendMessage, generateQuiz, generateCustomQuiz } = useLearningSession(topic, apiKey);
@@ -45,6 +48,24 @@ const LearningSession: React.FC<LearningSessionProps> = ({ colorMode }) => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Scroll handler for chat area
+  const handleChatScroll = () => {
+    if (!chatBoxRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatBoxRef.current;
+    // Show button if not at the bottom (allow 10px leeway)
+    setShowScrollToBottom(scrollHeight - scrollTop - clientHeight > 10);
+  };
+  // Show arrow with delay
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (showScrollToBottom) {
+      timeout = setTimeout(() => setDelayedShowArrow(true), 1000);
+    } else {
+      setDelayedShowArrow(false);
+    }
+    return () => clearTimeout(timeout);
+  }, [showScrollToBottom]);
 
   useEffect(() => {
     scrollToBottom();
@@ -168,7 +189,7 @@ const LearningSession: React.FC<LearningSessionProps> = ({ colorMode }) => {
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            filter: session.isQuizActive ? 'blur(6px)' : 'none', // increased blur for clarity
+            filter: session.isQuizActive ? 'blur(6px)' : 'none',
             transition: 'filter 0.3s ease',
             pointerEvents: session.isQuizActive ? 'none' : 'auto',
             borderRight: 1,
@@ -179,11 +200,14 @@ const LearningSession: React.FC<LearningSessionProps> = ({ colorMode }) => {
         >
           {/* Messages */}
           <Box
+            ref={chatBoxRef}
+            onScroll={handleChatScroll}
             sx={{
               flex: 1,
               overflow: 'auto',
-              p: 2,
-              pb: 10, // padding bottom for input
+              px: 5,
+              py: 2,
+              position: 'relative',
             }}
           >
             {session.messages.length === 0 ? (
@@ -211,47 +235,109 @@ const LearningSession: React.FC<LearningSessionProps> = ({ colorMode }) => {
             )}
             <div ref={messagesEndRef} />
           </Box>
-
-          {/* Input Area - fixed at bottom */}
-          <Paper
-            elevation={3}
+          {/* Scroll to bottom button (outside scroll area, above input) */}
+          {(
+            <Box
+              sx={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 70, // half overlaps the input bubble
+                display: 'flex',
+                justifyContent: 'center',
+                zIndex: 1200,
+                pointerEvents: delayedShowArrow ? 'auto' : 'none',
+                opacity: delayedShowArrow ? 1 : 0,
+                transition: 'opacity 0.4s cubic-bezier(0.4,0,0.2,1)',
+              }}
+            >
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={scrollToBottom}
+                sx={{
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  boxShadow: 2,
+                  '&:hover': { bgcolor: 'primary.main', color: 'white' },
+                  pointerEvents: 'auto',
+                }}
+              >
+                <KeyboardArrowDown fontSize="medium" />
+              </IconButton>
+            </Box>
+          )}
+          {/* Input Area - at the bottom, not absolute */}
+          <Box
             sx={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              bottom: 0,
-              p: 2,
+              pt: 0.25,
+              pb: 1.5,
+              px: 2,
               m: 0,
+              bgcolor: 'transparent',
               display: 'flex',
-              gap: 1,
               alignItems: 'flex-end',
               borderRadius: 0,
-              borderTop: 1,
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
             }}
           >
             <TextField
               fullWidth
               multiline
               maxRows={4}
-              placeholder="Type your message..."
+              minRows={2}
+              placeholder="Ask anything"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               disabled={isLoading}
               variant="outlined"
               size="small"
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    color="primary"
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim() || isLoading}
+                    sx={{
+                      bgcolor: 'background.paper',
+                      color: 'primary.contrastText',
+                      borderRadius: '50%',
+                      ml: 1,
+                      '&:hover': { bgcolor: 'primary.main' },
+                      width: 40,
+                      height: 40,
+                    }}
+                  >
+                    {isLoading ? <CircularProgress size={20} /> : <Send />}
+                  </IconButton>
+                ),
+                sx: {
+                  bgcolor: 'background.default',
+                  borderRadius: 3,
+                  px: 2,
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                  border: 'none',
+                },
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'background.default',
+                  borderRadius: 3,
+                  px: 2,
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                  border: 'none',
+                },
+                '& fieldset': {
+                  border: 'none',
+                },
+              }}
             />
-            <Button
-              variant="contained"
-              onClick={handleSendMessage}
-              disabled={!newMessage.trim() || isLoading}
-              sx={{ minWidth: 'auto', px: 2 }}
-            >
-              {isLoading ? <CircularProgress size={20} /> : <Send />}
-            </Button>
-          </Paper>
+          </Box>
         </Box>
         {/* Quiz Column (always visible) */}
         <Box
@@ -265,23 +351,6 @@ const LearningSession: React.FC<LearningSessionProps> = ({ colorMode }) => {
             height: '100%',
           }}
         >
-          <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Knowledge Check
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Test your understanding of what you've learned
-            </Typography>
-            <Button
-              variant="outlined"
-              color="primary"
-              disabled={isLoading}
-              onClick={() => generateCustomQuiz(3)}
-              sx={{ alignSelf: 'flex-start', mt: 1 }}
-            >
-              Generate 3-Question Quiz
-            </Button>
-          </Box>
           {session.quiz ? (
             <>
               <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
@@ -301,13 +370,32 @@ const LearningSession: React.FC<LearningSessionProps> = ({ colorMode }) => {
               )}
             </>
           ) : (
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 4 }}>
-              <Typography variant="h6" color="text.secondary" gutterBottom>
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', p: 4, pt: 8 }}>
+              <Typography variant="h6" color="text.secondary" gutterBottom sx={{ mt: 2, mb: 1 }}>
                 Quiz Area
               </Typography>
-              <Typography variant="body2" color="text.secondary" align="center">
+              <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 4 }}>
                 After 5 minutes of learning, a quiz will appear here to test your knowledge!
               </Typography>
+              <Button
+                variant="outlined"
+                color="primary"
+                disabled={isLoading}
+                onClick={() => generateCustomQuiz(3)}
+                sx={{
+                  borderRadius: 3,
+                  px: 2.5,
+                  py: 1,
+                  transition: 'background 0.35s cubic-bezier(0.4,0,0.2,1), border-color 0.35s cubic-bezier(0.4,0,0.2,1), color 0.35s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': {
+                    bgcolor: 'primary.main',
+                    borderColor: 'primary.main',
+                    color: 'white',
+                  },
+                }}
+              >
+                Generate Quiz
+              </Button>
             </Box>
           )}
         </Box>
