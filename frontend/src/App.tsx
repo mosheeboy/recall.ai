@@ -33,12 +33,12 @@ function App() {
             contrastText: mode === 'light' ? '#1B1B1B' : '#fff',
           },
           background: {
-            default: mode === 'light' ? '#F6F8F4' : '#212529', // main background
-            paper: mode === 'light' ? '#FFFFFF' : '#343a40', // main content area not white
+            default: mode === 'light' ? '#F6F8F4' : '#202020', // main background
+            paper: mode === 'light' ? '#FFFFFF' : '#252525', // chat input and main content area
           },
           text: {
-            primary: mode === 'light' ? '#1B1B1B' : '#f5f5f5',
-            secondary: mode === 'light' ? '#555' : '#bdbdbd',
+            primary: mode === 'light' ? '#1B1B1B' : '#fff',
+            secondary: mode === 'light' ? '#555' : '#fff',
           },
         },
         typography: {
